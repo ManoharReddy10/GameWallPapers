@@ -3,11 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.wordpress.androidredman.gamewallpaper.ImageViewActivity">
 
-    <ImageView
+
+    <com.edmodo.cropper.CropImageView
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/CropImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/iv_fullWallpaper"
+
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:id="@+id/fab"
+        android:src="@drawable/ic_done_white_48dp"
+        android:background="#ff7700"
+        app:backgroundTint="#ff7700"
         />
 </RelativeLayout>

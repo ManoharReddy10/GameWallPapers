@@ -15,12 +15,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,35 +27,39 @@ import java.util.List;
  * Created by Redman on 7/18/2017.
  */
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyviewHolder>{
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyviewHolder> {
 
     Context mContext;
-    List<String> imageUrlList=new ArrayList<>();
+    List<String> imageUrlList = new ArrayList<>();
 
-    List<Bitmap> bitmapList=new ArrayList<>();
+    List<Bitmap> bitmapList = new ArrayList<>();
 
     Bitmap[] bitmapArray;
 
-    RecyclerAdapter(Context ctx, List<String> imagesList){
-        mContext=ctx;
-        imageUrlList=imagesList;
-        Log.d("imagesList","imagesList Size "+imageUrlList.size());
-        bitmapArray=new Bitmap[imageUrlList.size()];
+    RecyclerAdapter(Context ctx, List<String> imagesList) {
+        mContext = ctx;
+        imageUrlList = imagesList;
+        Log.d("imagesList", "imagesList Size " + imageUrlList.size());
+        bitmapArray = new Bitmap[imageUrlList.size()];
     }
 
     @Override
     public MyviewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.sub_recycler,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sub_recycler, parent, false);
         return new MyviewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final MyviewHolder holder, final int position) {
 
-
-      Glide.with(mContext)
-                .asBitmap()
-              .load(imageUrlList.get(position))
+        if (bitmapArray[position] != null) {
+            holder.wallpaperImage.setImageBitmap(bitmapArray[position]);
+        }
+        else{
+            holder.wallpaperImage.setImageBitmap(null);
+            Glide.with(mContext)
+                    .asBitmap()
+                    .load(imageUrlList.get(position))
 //              .into(new BitmapImageViewTarget(holder.wallpaperImage){
 //                  @Override
 //                  protected void setResource(Bitmap resource) {
@@ -65,15 +67,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Myview
 //                      super.setResource(resource);
 //                  }
 //              });
-              .into(new SimpleTarget<Bitmap>() {
-                  @Override
-                  public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                   holder.wallpaperImage.setImageBitmap(resource);
-                      bitmapList.add(resource);
-                      bitmapArray[position]=resource;
-                  }
-              });
 
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            holder.wallpaperImage.setImageBitmap(resource);
+                            bitmapList.add(resource);
+                            bitmapArray[position] = resource;
+                        }
+                    });
+
+        }
 
 
         holder.wallpaperImage.setOnLongClickListener(new View.OnLongClickListener() {
@@ -87,8 +91,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Myview
         holder.wallpaperImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             //   Bitmap bmp=bitmapList.get(position);
-                if(bitmapArray[position]!=null) {
+                //   Bitmap bmp=bitmapList.get(position);
+                if (bitmapArray[position] != null) {
                     Bitmap bmp = bitmapArray[position];
 
 
@@ -99,8 +103,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Myview
                     byte[] imagebytes = stream.toByteArray();
                     intent.putExtra("img_byte", imagebytes);
                     mContext.startActivity(intent);
-                }
-                else
+                } else
                     Toast.makeText(mContext.getApplicationContext(), "Please Wait Loading Image", Toast.LENGTH_SHORT).show();
 
               /*  try {
@@ -136,39 +139,39 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Myview
 
         public MyviewHolder(View itemView) {
             super(itemView);
-            wallpaperImage=itemView.findViewById(R.id.iv_wallpaperImage);
+            wallpaperImage = itemView.findViewById(R.id.iv_wallpaperImage);
         }
     }
 
-private void showAlert(final int pos){
-    AlertDialog.Builder builder=new AlertDialog.Builder(mContext)
-            .setMessage("Do you want to set this Image as wallpaper?")
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+    private void showAlert(final int pos) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
+                .setMessage("Do you want to set this Image as wallpaper?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                  setWallpaper(pos);
+                        setWallpaper(pos);
 
-                }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.cancel();
-                }
-            });
-            builder.show();
-}
-
-private void setWallpaper(int pos){
-    WallpaperManager wallpaperManager= WallpaperManager.getInstance(mContext);
-    try {
-        wallpaperManager.setBitmap(bitmapList.get(pos));
-        Toast.makeText(mContext, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        Toast.makeText(mContext, "Unable to set wallpaper", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        builder.show();
     }
-}
+
+    private void setWallpaper(int pos) {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(mContext);
+        try {
+            wallpaperManager.setBitmap(bitmapList.get(pos));
+            Toast.makeText(mContext, "Wallpaper set successfully", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(mContext, "Unable to set wallpaper", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
